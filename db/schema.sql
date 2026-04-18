@@ -15,11 +15,11 @@ BEGIN;
 CREATE TYPE rol_usuario AS ENUM ('admin', 'estudiante', 'autoridad');
 
 -- ============================================================
--- 2. TABLE: escuelas
+-- 2. TABLE: escuela
 -- ============================================================
 -- Central entity representing each school/institution.
 
-CREATE TABLE escuelas (
+CREATE TABLE escuela (
     id_escuela    SERIAL       PRIMARY KEY,
     nombre        VARCHAR(200) NOT NULL UNIQUE,
     descripcion   TEXT,
@@ -28,20 +28,20 @@ CREATE TABLE escuelas (
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
-COMMENT ON TABLE  escuelas IS 'Schools or academic institutions';
-COMMENT ON COLUMN escuelas.nombre IS 'Official name of the school';
-COMMENT ON COLUMN escuelas.ubicacion IS 'Physical address or location description';
+COMMENT ON TABLE  escuela IS 'Schools or academic institutions';
+COMMENT ON COLUMN escuela.nombre IS 'Official name of the school';
+COMMENT ON COLUMN escuela.ubicacion IS 'Physical address or location description';
 
 -- ============================================================
--- 3. TABLE: carreras
+-- 3. TABLE: carrera
 -- ============================================================
--- Academic programs belonging to a school. (1 escuela → N carreras)
+-- Academic programs belonging to a school. (1 escuela → N carrera)
 
-CREATE TABLE carreras (
+CREATE TABLE carrera (
     id_carrera    SERIAL       PRIMARY KEY,
     nombre        VARCHAR(200) NOT NULL,
     id_escuela    INTEGER      NOT NULL
-                               REFERENCES escuelas(id_escuela)
+                               REFERENCES escuela(id_escuela)
                                ON DELETE CASCADE,
     created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
@@ -50,28 +50,28 @@ CREATE TABLE carreras (
     CONSTRAINT uq_carrera_por_escuela UNIQUE (id_escuela, nombre)
 );
 
-CREATE INDEX idx_carreras_escuela ON carreras(id_escuela);
+CREATE INDEX idx_carrera_escuela ON carrera(id_escuela);
 
-COMMENT ON TABLE  carreras IS 'Academic programs (careers) offered by a school';
-COMMENT ON COLUMN carreras.nombre IS 'Name of the academic program';
+COMMENT ON TABLE  carrera IS 'Academic programs (careers) offered by a school';
+COMMENT ON COLUMN carrera.nombre IS 'Name of the academic program';
 
 
 
 -- ============================================================
--- 4. TABLE: autoridades
+-- 4. TABLE: autoridad
 -- ============================================================
 -- People holding authority positions within a school.
--- (1 escuela → N autoridades)
+-- (1 escuela → N autoridad)
 -- Ordered by orden_jerarquico (1 = highest rank).
 
-CREATE TABLE autoridades (
+CREATE TABLE autoridad (
     id_autoridad      SERIAL       PRIMARY KEY,
     nombre_completo   VARCHAR(250) NOT NULL,
     cargo             VARCHAR(150) NOT NULL,
     correo            VARCHAR(200) NOT NULL,
     telefono          VARCHAR(30),
     id_escuela        INTEGER      NOT NULL
-                                   REFERENCES escuelas(id_escuela)
+                                   REFERENCES escuela(id_escuela)
                                    ON DELETE CASCADE,
     orden_jerarquico  SMALLINT     NOT NULL DEFAULT 0
                                    CHECK (orden_jerarquico >= 0),
@@ -83,18 +83,18 @@ CREATE TABLE autoridades (
     CONSTRAINT uq_orden_por_escuela UNIQUE (id_escuela, orden_jerarquico)
 );
 
-CREATE INDEX idx_autoridades_escuela       ON autoridades(id_escuela);
-CREATE INDEX idx_autoridades_jerarquia     ON autoridades(id_escuela, orden_jerarquico);
+CREATE INDEX idx_autoridad_escuela       ON autoridad(id_escuela);
+CREATE INDEX idx_autoridad_jerarquia     ON autoridad(id_escuela, orden_jerarquico);
 
-COMMENT ON TABLE  autoridades IS 'School authorities/leaders ordered by hierarchy';
-COMMENT ON COLUMN autoridades.orden_jerarquico IS '1 = highest rank; lower numbers appear first';
+COMMENT ON TABLE  autoridad IS 'School authorities/leaders ordered by hierarchy';
+COMMENT ON COLUMN autoridad.orden_jerarquico IS '1 = highest rank; lower numbers appear first';
 
 -- ============================================================
--- 5. TABLE: usuarios
+-- 5. TABLE: usuario
 -- ============================================================
 -- Application users authenticated via institutional email.
 
-CREATE TABLE usuarios (
+CREATE TABLE usuario (
     id_usuario            SERIAL        PRIMARY KEY,
     correo_institucional  VARCHAR(200)  NOT NULL UNIQUE,
     rol                   rol_usuario   NOT NULL DEFAULT 'estudiante',
@@ -104,10 +104,10 @@ CREATE TABLE usuarios (
     updated_at            TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_usuarios_rol ON usuarios(rol);
+CREATE INDEX idx_usuario_rol ON usuario(rol);
 
-COMMENT ON TABLE  usuarios IS 'Registered application users';
-COMMENT ON COLUMN usuarios.correo_institucional IS 'Institutional email used for authentication';
+COMMENT ON TABLE  usuario IS 'Registered application users';
+COMMENT ON COLUMN usuario.correo_institucional IS 'Institutional email used for authentication';
 
 -- ============================================================
 -- 6. TRIGGER: auto-update updated_at
@@ -121,20 +121,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_updated_at_escuelas
-    BEFORE UPDATE ON escuelas
+CREATE TRIGGER set_updated_at_escuela
+    BEFORE UPDATE ON escuela
     FOR EACH ROW EXECUTE FUNCTION trg_set_updated_at();
 
-CREATE TRIGGER set_updated_at_carreras
-    BEFORE UPDATE ON carreras
+CREATE TRIGGER set_updated_at_carrera
+    BEFORE UPDATE ON carrera
     FOR EACH ROW EXECUTE FUNCTION trg_set_updated_at();
 
-CREATE TRIGGER set_updated_at_autoridades
-    BEFORE UPDATE ON autoridades
+CREATE TRIGGER set_updated_at_autoridad
+    BEFORE UPDATE ON autoridad
     FOR EACH ROW EXECUTE FUNCTION trg_set_updated_at();
 
-CREATE TRIGGER set_updated_at_usuarios
-    BEFORE UPDATE ON usuarios
+CREATE TRIGGER set_updated_at_usuario
+    BEFORE UPDATE ON usuario
     FOR EACH ROW EXECUTE FUNCTION trg_set_updated_at();
 
 COMMIT;

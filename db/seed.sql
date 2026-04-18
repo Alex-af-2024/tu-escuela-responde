@@ -9,7 +9,7 @@ BEGIN;
 -- 1. Escuelas
 -- ============================================================
 
-INSERT INTO escuelas (nombre, descripcion, ubicacion) VALUES
+INSERT INTO escuela (nombre, descripcion, ubicacion) VALUES
     ('Escuela de Ingeniería',
      'Escuela dedicada a las disciplinas de ingeniería y tecnología.',
      'Edificio A, Campus Central, Av. Universidad 1000'),
@@ -25,20 +25,20 @@ INSERT INTO escuelas (nombre, descripcion, ubicacion) VALUES
 -- ============================================================
 
 -- Escuela de Ingeniería (id_escuela = 1)
-INSERT INTO carreras (nombre, id_escuela) VALUES
+INSERT INTO carrera (nombre, id_escuela) VALUES
     ('Ingeniería en Informática', 1),
     ('Ingeniería Civil',          1),
     ('Ingeniería Industrial',     1),
     ('Ingeniería Electrónica',    1);
 
 -- Escuela de Ciencias de la Salud (id_escuela = 2)
-INSERT INTO carreras (nombre, id_escuela) VALUES
+INSERT INTO carrera (nombre, id_escuela) VALUES
     ('Medicina',                  2),
     ('Enfermería',                2),
     ('Kinesiología',              2);
 
 -- Escuela de Ciencias Sociales (id_escuela = 3)
-INSERT INTO carreras (nombre, id_escuela) VALUES
+INSERT INTO carrera (nombre, id_escuela) VALUES
     ('Psicología',                3),
     ('Trabajo Social',            3),
     ('Derecho',                   3);
@@ -49,20 +49,20 @@ INSERT INTO carreras (nombre, id_escuela) VALUES
 -- ============================================================
 
 -- Escuela de Ingeniería
-INSERT INTO autoridades (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
+INSERT INTO autoridad (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
     ('Dr. Roberto Méndez Silva',      'Director de Escuela',           'rmendez@institucion.cl',   '+56 9 1234 5678', 1, 1),
     ('Mg. Carla Fuentes Rojas',       'Subdirectora Académica',        'cfuentes@institucion.cl',  '+56 9 2345 6789', 1, 2),
     ('Ing. Felipe Araya Torres',      'Jefe de Carrera',               'faraya@institucion.cl',    '+56 9 3456 7890', 1, 3),
     ('Ing. Daniela Cortés Vargas',    'Coordinadora de Prácticas',     'dcortes@institucion.cl',   '+56 9 4567 8901', 1, 4);
 
 -- Escuela de Ciencias de la Salud
-INSERT INTO autoridades (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
+INSERT INTO autoridad (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
     ('Dra. Patricia Molina Gómez',    'Directora de Escuela',          'pmolina@institucion.cl',   '+56 9 5678 9012', 2, 1),
     ('Dr. Andrés Soto Bravo',         'Subdirector Académico',         'asoto@institucion.cl',     '+56 9 6789 0123', 2, 2),
     ('Enf. María José Pizarro Díaz',  'Secretaria Académica',          'mjpizarro@institucion.cl', '+56 9 7890 1234', 2, 3);
 
 -- Escuela de Ciencias Sociales
-INSERT INTO autoridades (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
+INSERT INTO autoridad (nombre_completo, cargo, correo, telefono, id_escuela, orden_jerarquico) VALUES
     ('Mg. Josefina Reyes Lagos',      'Directora de Escuela',          'jreyes@institucion.cl',    '+56 9 8901 2345', 3, 1),
     ('Dr. Álvaro Henríquez Peña',     'Subdirector Académico',         'ahenriquez@institucion.cl', '+56 9 9012 3456', 3, 2),
     ('Ps. Valentina Cárdenas Muñoz',  'Jefa de Carrera',               'vcardenas@institucion.cl', '+56 9 0123 4567', 3, 3),
@@ -72,7 +72,7 @@ INSERT INTO autoridades (nombre_completo, cargo, correo, telefono, id_escuela, o
 -- 4. Usuarios
 -- ============================================================
 
-INSERT INTO usuarios (correo_institucional, rol, nombre_display) VALUES
+INSERT INTO usuario (correo_institucional, rol, nombre_display) VALUES
     ('admin@institucion.cl',      'admin',      'Administrador General'),
     ('estudiante1@mail.inst.cl',  'estudiante', 'María González'),
     ('estudiante2@mail.inst.cl',  'estudiante', 'Carlos Pérez'),
