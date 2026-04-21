@@ -10,12 +10,12 @@
 -- Links each application user to their Supabase Auth identity.
 
 ALTER TABLE usuario
-    ADD COLUMN auth_uid UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE;
+    ADD COLUMN IF NOT EXISTS auth_uid UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE;
 
 COMMENT ON COLUMN usuario.auth_uid IS 'References auth.users(id) — Supabase Auth identity';
 
 -- Create index for fast lookups by auth UID
-CREATE INDEX idx_usuario_auth_uid ON usuario(auth_uid);
+CREATE INDEX IF NOT EXISTS idx_usuario_auth_uid ON usuario(auth_uid);
 
 
 -- ============================================================
@@ -36,6 +36,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS enforce_email_domain ON auth.users;
 CREATE TRIGGER enforce_email_domain
     BEFORE INSERT ON auth.users
     FOR EACH ROW
@@ -67,6 +68,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
@@ -88,11 +90,13 @@ ALTER TABLE usuario    ENABLE ROW LEVEL SECURITY;
 -- ============================================================
 
 -- Users can read their own profile
+DROP POLICY IF EXISTS "usuario_select_own" ON usuario;
 CREATE POLICY "usuario_select_own"
     ON usuario FOR SELECT
     USING (auth.uid() = auth_uid);
 
 -- Admins can read all user profiles
+DROP POLICY IF EXISTS "usuario_select_admin" ON usuario;
 CREATE POLICY "usuario_select_admin"
     ON usuario FOR SELECT
     USING (
@@ -104,6 +108,7 @@ CREATE POLICY "usuario_select_admin"
     );
 
 -- Users can update their own display name
+DROP POLICY IF EXISTS "usuario_update_own" ON usuario;
 CREATE POLICY "usuario_update_own"
     ON usuario FOR UPDATE
     USING (auth.uid() = auth_uid)
@@ -115,15 +120,13 @@ CREATE POLICY "usuario_update_own"
 
 
 -- ============================================================
--- 6. RLS Policies — escuela, carrera, autoridad (read-only)
+-- 6. RLS Policies — escuela, carrera, autoridad
 -- ============================================================
-
--- Any authenticated user can read schools
-CREATE POLICY "escuela_select_authenticated"
-    ON escuela FOR SELECT
-    USING (auth.role() = 'authenticated');
+-- READ policies are defined in rls_policies.sql (public access).
+-- Only admin WRITE policies are kept here.
 
 -- Only admins can insert/update/delete schools
+DROP POLICY IF EXISTS "escuela_modify_admin" ON escuela;
 CREATE POLICY "escuela_modify_admin"
     ON escuela FOR ALL
     USING (
@@ -134,12 +137,8 @@ CREATE POLICY "escuela_modify_admin"
         )
     );
 
--- Any authenticated user can read careers
-CREATE POLICY "carrera_select_authenticated"
-    ON carrera FOR SELECT
-    USING (auth.role() = 'authenticated');
-
 -- Only admins can modify careers
+DROP POLICY IF EXISTS "carrera_modify_admin" ON carrera;
 CREATE POLICY "carrera_modify_admin"
     ON carrera FOR ALL
     USING (
@@ -150,12 +149,8 @@ CREATE POLICY "carrera_modify_admin"
         )
     );
 
--- Any authenticated user can read authorities
-CREATE POLICY "autoridad_select_authenticated"
-    ON autoridad FOR SELECT
-    USING (auth.role() = 'authenticated');
-
 -- Only admins can modify authorities
+DROP POLICY IF EXISTS "autoridad_modify_admin" ON autoridad;
 CREATE POLICY "autoridad_modify_admin"
     ON autoridad FOR ALL
     USING (
