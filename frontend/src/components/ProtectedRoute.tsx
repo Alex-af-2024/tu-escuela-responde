@@ -14,19 +14,17 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (loading) {
     return (
-      <div className="loading-screen">
-        <div className="spinner" />
-        <p>Cargando…</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-surface-900">
+        <div className="w-9 h-9 border-3 border-white/15 border-t-gold-400 rounded-full animate-spin" />
+        <p className="text-sm text-gray-500">Cargando…</p>
       </div>
     );
   }
 
-  // Not logged in
   if (!session || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Email not yet confirmed
   if (!user.email_confirmed_at) {
     return <Navigate to="/verify-email" replace />;
   }
